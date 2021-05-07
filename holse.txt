@@ -1,0 +1,35 @@
+mkdir /tmp/iso
+mkdir /tmp/cucm
+
+sudo mount -o loop ~/Downloads/CUCM/12.5/BOOT-UCSInstall_UCOS_12.5.1.14900-63.sgn.iso /tmp/iso
+
+rsync -a /tmp/iso/ /tmp/cucm/
+
+cd /tmp/cucm/
+
+cd Cisco/hssi/server_implementation/KVM/QEMU/shared/bin
+mv api_implementation.sh.proposed api_implementation.sh
+
+cd Cisco/hssi/server_implementation/KVM/shared/bin
+change KVM.data: expected_manufacturer=QEMU\|Bochs\|SeaBIOS
+
+cd Cisco/base_scripts/
+7) Edit hasHwSnmpMonitoring function in Cisco/base_scripts/ihardware.sh:
+vi /tmp/CUCM/Cisco/base_scripts/ihardware.sh
+
+The function should look like:
+function hasHwSnmpMonitoring()
+{
+    return 1
+}
+
+
+
+
+cd /tmp/cucm/
+
+mkisofs -o /tmp/1KVM-BOOT-UCSInstall_UCOS_12.5.1.14900-63.sgn.iso -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table  -J -R .
+mkisofs -o /tmp/KVM-BOOT-CUCM125.iso -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table  -J -R .
+
+
+ref: https://www.youtube.com/watch?v=pPO75mWN1xw
